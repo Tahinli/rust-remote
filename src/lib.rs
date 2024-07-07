@@ -11,21 +11,27 @@ pub enum Runner {
     Client,
 }
 
-#[derive(Debug)]
+pub enum RunnerMode {
+    State(Runner, bool),
+}
+
+#[derive(Debug, Clone)]
 pub struct Config {
     pub server_address: IpAddr,
     pub port: u16,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Payload {
     pub sudo: bool,
+    pub user: String,
     pub command: String,
     pub args: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Report {
+    pub payload: Payload,
     pub status: String,
     pub stdout: String,
     pub stderr: String,
