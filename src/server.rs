@@ -46,8 +46,8 @@ pub async fn start(config: Config, debug: bool) {
         }
     }
 }
-pub async fn setup(config: Config, debug: bool) -> Option<TcpListener> {
-    match TcpListener::bind(format!("{}:{}", config.server_address, config.port)).await {
+async fn setup(config: Config, debug: bool) -> Option<TcpListener> {
+    match TcpListener::bind(format!("{}:{}", config.ip, config.port)).await {
         Ok(listener) => Some(listener),
         Err(err_val) => {
             if debug {
@@ -58,7 +58,7 @@ pub async fn setup(config: Config, debug: bool) -> Option<TcpListener> {
     }
 }
 
-pub async fn establish_connection(
+async fn establish_connection(
     listener: &TcpListener,
     debug: bool,
 ) -> Option<(WebSocketSender, WebSocketReceiver)> {
@@ -81,7 +81,7 @@ pub async fn establish_connection(
     }
 }
 
-pub async fn payload_from_input(debug: bool) -> Option<Payload> {
+async fn payload_from_input(debug: bool) -> Option<Payload> {
     println!("User");
     // let user = match get_input() {
     //     Some(input) => input,
@@ -116,7 +116,7 @@ pub async fn payload_from_input(debug: bool) -> Option<Payload> {
     }
 }
 
-pub fn get_input(debug: bool) -> Option<String> {
+fn get_input(debug: bool) -> Option<String> {
     let mut payload_input: String = String::new();
     match stdin().read_line(&mut payload_input) {
         Ok(_) => Some(payload_input.trim().to_string()),
@@ -129,7 +129,7 @@ pub fn get_input(debug: bool) -> Option<String> {
     }
 }
 
-pub async fn receive(ws_receiver: Arc<Mutex<WebSocketReceiver>>, debug: bool) -> Option<String> {
+async fn receive(ws_receiver: Arc<Mutex<WebSocketReceiver>>, debug: bool) -> Option<String> {
     match ws_receiver.lock().await.next().await {
         Some(message) => match message {
             Ok(message) => {
@@ -158,7 +158,7 @@ pub async fn receive(ws_receiver: Arc<Mutex<WebSocketReceiver>>, debug: bool) ->
     }
 }
 
-pub async fn send(payload: Payload, ws_sender: Arc<Mutex<WebSocketSender>>, debug: bool) -> bool {
+async fn send(payload: Payload, ws_sender: Arc<Mutex<WebSocketSender>>, debug: bool) -> bool {
     let payload = serde_json::json!(payload);
     let result = ws_sender
         .lock()

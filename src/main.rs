@@ -1,22 +1,14 @@
-use rust_remote::{
-    utils::{read_config, take_args},
-    Runner, RunnerMode,
-};
+use rust_remote::{utils::take_args, Runner, RunnerMode};
 
 #[tokio::main]
 async fn main() {
     println!("Hello, world!");
 
-    let config = match read_config() {
-        Some(config) => config,
-        None => {
-            eprintln!("Error: Read Config");
-            return;
-        }
-    };
+    let args = take_args();
+    println!("{:#?}", args);
 
-    match take_args() {
-        Some(runner_mode) => match runner_mode {
+    match args {
+        Some((runner_mode, config)) => match runner_mode {
             RunnerMode::State(Runner::Server, false) => {
                 rust_remote::server::start(config, false).await
             }
