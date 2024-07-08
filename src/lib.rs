@@ -26,8 +26,7 @@ pub struct Config {
 pub struct Payload {
     pub sudo: bool,
     pub user: String,
-    pub command: String,
-    pub args: Vec<String>,
+    pub args: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

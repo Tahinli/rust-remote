@@ -68,8 +68,20 @@ async fn execute(payload: Payload, debug: bool) -> Option<Output> {
     if debug {
         println!("{:#?}", payload);
     }
-    match Command::new(payload.command)
-        .args(payload.args)
+    let command = if cfg!(target_os = "windows") {
+        "cmd"
+    } else {
+        "sh"
+    };
+
+    let first_arg = if cfg!(target_os = "windows") {
+        "/C"
+    } else {
+        "-c"
+    };
+    match Command::new(command)
+        .arg(first_arg)
+        .arg(payload.args)
         .output()
         .await
     {

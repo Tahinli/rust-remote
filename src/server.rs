@@ -91,26 +91,19 @@ async fn payload_from_input(debug: bool) -> Option<Payload> {
     println!("Command");
     match get_input(debug) {
         Some(input) => {
-            let mut args: Vec<String> = input.split_ascii_whitespace().map(String::from).collect();
-            if args.is_empty() {
-                None
-            } else {
-                let mut sudo = false;
-                let mut command = args.remove(0);
-                if command == "sudo" {
-                    if args.is_empty() {
-                        return None;
+            let mut sudo = false;
+            let args = match input.split_once(" ") {
+                Some(input_splitted) => {
+                    if input_splitted.0 == "sudo" {
+                        sudo = true;
+                        input_splitted.1.to_string()
+                    } else {
+                        input
                     }
-                    sudo = true;
-                    command = args.remove(0);
                 }
-                Some(Payload {
-                    sudo,
-                    user,
-                    command,
-                    args,
-                })
-            }
+                None => input,
+            };
+            Some(Payload { sudo, user, args })
         }
         None => None,
     }
