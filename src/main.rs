@@ -5,23 +5,32 @@ async fn main() {
     println!("Hello, world!");
 
     let args = take_args();
-    println!("{:#?}", args);
 
     match args {
-        Some((runner_mode, config)) => match runner_mode {
-            RunnerMode::State(Runner::Server, false) => {
-                rust_remote::server::start(config, false).await
+        Some((runner_mode, config)) => {
+            println!("-------");
+            println!("Runner Mode ↓");
+            runner_mode.print();
+            println!("-------");
+            println!("Config ↓");
+            config.print();
+            println!("-------");
+            
+            match runner_mode {
+                RunnerMode::State(Runner::Server, false) => {
+                    rust_remote::server::start(config, false).await
+                }
+                RunnerMode::State(Runner::Server, true) => {
+                    rust_remote::server::start(config, true).await
+                }
+                RunnerMode::State(Runner::Client, false) => {
+                    rust_remote::client::start(config, false).await
+                }
+                RunnerMode::State(Runner::Client, true) => {
+                    rust_remote::client::start(config, true).await
+                }
             }
-            RunnerMode::State(Runner::Server, true) => {
-                rust_remote::server::start(config, true).await
-            }
-            RunnerMode::State(Runner::Client, false) => {
-                rust_remote::client::start(config, false).await
-            }
-            RunnerMode::State(Runner::Client, true) => {
-                rust_remote::client::start(config, true).await
-            }
-        },
+        }
         None => {
             eprintln!("Error: Take Args");
             return;

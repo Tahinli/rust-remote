@@ -10,7 +10,7 @@ use tokio::{
 };
 use tokio_tungstenite::{accept_async, tungstenite::Message, WebSocketStream};
 
-use crate::{Config, Payload};
+use crate::{Config, Payload, Report};
 type WebSocketSender = SplitSink<WebSocketStream<TcpStream>, Message>;
 type WebSocketReceiver = SplitStream<WebSocketStream<TcpStream>>;
 
@@ -34,8 +34,13 @@ pub async fn start(config: Config, debug: bool) {
                                 break;
                             }
                             tokio::spawn(async move {
-                                let report = receive(ws_receiver, debug).await;
-                                println!("{:#?}", report);
+                                match receive(ws_receiver, debug).await {
+                                    Some(report) => match serde_json::from_str::<Report>(&report) {
+                                        Ok(report) => report.print(),
+                                        Err(_) => {}
+                                    },
+                                    None => todo!(),
+                                }
                             });
                         }
                         None => continue,
@@ -83,7 +88,7 @@ async fn establish_connection(
 
 async fn payload_from_input(debug: bool) -> Option<Payload> {
     println!("User");
-    // let user = match get_input() {
+    // let user = match get_input(debug) {
     //     Some(input) => input,
     //     None => return None,
     // };

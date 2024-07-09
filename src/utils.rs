@@ -4,7 +4,7 @@ use crate::{Config, Runner, RunnerMode};
 
 pub fn take_args() -> Option<(RunnerMode, Config)> {
     let args: Vec<String> = env::args().collect();
-    let mut runner = Runner::Server;
+    let mut runner = Runner::Client;
     let mut debug = false;
     let mut ip = "127.0.0.1".to_string();
     let mut port = "3444".to_string();
@@ -30,8 +30,6 @@ pub fn take_args() -> Option<(RunnerMode, Config)> {
         }
     };
 
-    println!("{:#?}", ip);
-
     let port = match port.parse::<u16>() {
         Ok(port) => port,
         Err(err_val) => {
@@ -52,8 +50,8 @@ fn show_help() {
     println!("----------------------------------------------------------------------");
     println!("   -i  -> --ip        |  Specifies IP Address       |  127.0.0.1");
     println!("   -p  -> --port      |  Specifies Port Address     |  3444");
-    println!("   -sv -> --server    |  Starts as a Server         |  True");
-    println!("   -cl -> --client    |  Starts as a Client         |  False");
+    println!("   -sv -> --server    |  Starts as a Server         |  False");
+    println!("   -cl -> --client    |  Starts as a Client         |  True");
     println!("   -d  -> --debug     |  Starts in Debug Mode       |  False");
     println!("   -h  -> --help      |  Shows Help                 |  False");
     println!("\n\n\n");
