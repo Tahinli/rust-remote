@@ -53,16 +53,12 @@ impl Config {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Payload {
-    pub sudo: bool,
-    pub user: String,
     pub args: String,
 }
 
 impl Payload {
     fn print(&self) {
         println!("-------");
-        println!("sudo = {}", self.sudo);
-        println!("user = {}", self.user);
         println!("args = {}", self.args);
     }
 }
