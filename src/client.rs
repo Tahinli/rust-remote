@@ -90,7 +90,7 @@ async fn execute(payload: Payload, debug: bool) -> Option<Output> {
             if debug {
                 eprintln!("Error: Command Execution | {}", err_val);
             }
-            return None;
+            None
         }
     }
 }
@@ -144,6 +144,10 @@ async fn send(
             stderr: "Nope".to_string(),
         },
     };
+
+    if debug {
+        report.print();
+    }
 
     let report = serde_json::json!(report);
     let result = ws_sender.lock().await.send(report.to_string().into()).await;

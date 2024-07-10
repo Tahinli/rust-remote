@@ -13,8 +13,8 @@ pub fn take_args() -> Option<(RunnerMode, Config)> {
             "--server" | "-sv" => runner = Runner::Server,
             "--client" | "-cl" => runner = Runner::Client,
             "--debug" | "-d" => debug = true,
-            "--ip" | "-i" => ip = args[i + 1].clone(),
-            "--port" | "-p" => port = args[i + 1].clone(),
+            "--ip" | "-i" => ip.clone_from(&args[i + 1]),
+            "--port" | "-p" => port.clone_from(&args[i + 1]),
             "--help" | "-h" => {
                 show_help();
                 std::process::exit(0);

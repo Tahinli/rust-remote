@@ -14,6 +14,7 @@ pub enum Runner {
 
 impl Runner {
     fn print(&self) {
+        println!("-------");
         match self {
             Runner::Server => println!("Runner = Server"),
             Runner::Client => println!("Runner = Client"),
@@ -44,6 +45,7 @@ pub struct Config {
 
 impl Config {
     pub fn print(&self) {
+        println!("-------");
         println!("IP = {}", self.ip);
         println!("Port = {}", self.port);
     }
@@ -58,6 +60,7 @@ pub struct Payload {
 
 impl Payload {
     fn print(&self) {
+        println!("-------");
         println!("sudo = {}", self.sudo);
         println!("user = {}", self.user);
         println!("args = {}", self.args);
@@ -88,7 +91,6 @@ impl Report {
         }
         if !self.stderr.is_empty() {
             println!("Stderr ↓ \n{}", self.stderr);
-            println!("-------");
         }
     }
 }
