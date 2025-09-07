@@ -66,7 +66,7 @@ async fn serve((ws_sender, mut ws_receiver): (WebSocketSender, WebSocketReceiver
 
 async fn execute(payload: Payload, debug: bool) -> Option<Output> {
     if debug {
-        println!("{:#?}", payload);
+        payload.print();
     }
     let command = if cfg!(target_os = "windows") {
         "cmd"
