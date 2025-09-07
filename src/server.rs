@@ -94,31 +94,8 @@ async fn establish_connection(
 
 async fn payload_from_input(debug: bool) -> Option<Payload> {
     println!("-------");
-    println!("User");
-    // let user = match get_input(debug) {
-    //     Some(input) => input,
-    //     None => return None,
-    // };
-    let user = "tahinli".to_string();
     println!("Command");
-    match get_input(debug) {
-        Some(input) => {
-            let mut sudo = false;
-            let args = match input.split_once(' ') {
-                Some(input_splitted) => {
-                    if input_splitted.0 == "sudo" {
-                        sudo = true;
-                        input_splitted.1.to_string()
-                    } else {
-                        input
-                    }
-                }
-                None => input,
-            };
-            Some(Payload { sudo, user, args })
-        }
-        None => None,
-    }
+    get_input(debug).map(|args| Payload { args })
 }
 
 fn get_input(debug: bool) -> Option<String> {
