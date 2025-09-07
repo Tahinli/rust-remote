@@ -31,15 +31,21 @@ pub async fn start(config: Config, debug: bool) {
                     match payload_from_input(debug).await {
                         Some(payload) => {
                             if !send(payload, ws_sender, debug).await {
+                                if debug {
+                                    eprintln!("Error: Send");
+                                }
                                 break;
                             }
                             tokio::spawn(async move {
-                                match receive(ws_receiver, debug).await {
-                                    Some(report) => match serde_json::from_str::<Report>(&report) {
+                                if let Some(report) = receive(ws_receiver, debug).await {
+                                    match serde_json::from_str::<Report>(&report) {
                                         Ok(report) => report.print(),
-                                        Err(_) => {}
-                                    },
-                                    None => todo!(),
+                                        Err(err_val) => {
+                                            if debug {
+                                                eprintln!("Error: Deserialize | {}", err_val);
+                                            }
+                                        }
+                                    }
                                 }
                             });
                         }
@@ -87,6 +93,7 @@ async fn establish_connection(
 }
 
 async fn payload_from_input(debug: bool) -> Option<Payload> {
+    println!("-------");
     println!("User");
     // let user = match get_input(debug) {
     //     Some(input) => input,
@@ -97,7 +104,7 @@ async fn payload_from_input(debug: bool) -> Option<Payload> {
     match get_input(debug) {
         Some(input) => {
             let mut sudo = false;
-            let args = match input.split_once(" ") {
+            let args = match input.split_once(' ') {
                 Some(input_splitted) => {
                     if input_splitted.0 == "sudo" {
                         sudo = true;

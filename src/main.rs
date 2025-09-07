@@ -8,14 +8,9 @@ async fn main() {
 
     match args {
         Some((runner_mode, config)) => {
-            println!("-------");
-            println!("Runner Mode ↓");
             runner_mode.print();
-            println!("-------");
-            println!("Config ↓");
             config.print();
-            println!("-------");
-            
+
             match runner_mode {
                 RunnerMode::State(Runner::Server, false) => {
                     rust_remote::server::start(config, false).await
