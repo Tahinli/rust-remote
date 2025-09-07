@@ -13,8 +13,8 @@ pub fn take_args() -> Option<(RunnerMode, Config)> {
             "--server" | "-sv" => runner = Runner::Server,
             "--client" | "-cl" => runner = Runner::Client,
             "--debug" | "-d" => debug = true,
-            "--ip" | "i" => ip = args[i + 1].clone(),
-            "--port" | "p" => port = args[i + 1].clone(),
+            "--ip" | "-i" => ip = args[i + 1].clone(),
+            "--port" | "-p" => port = args[i + 1].clone(),
             "--help" | "-h" => {
                 show_help();
                 std::process::exit(0);
@@ -29,6 +29,8 @@ pub fn take_args() -> Option<(RunnerMode, Config)> {
             return None;
         }
     };
+
+    println!("{:#?}", ip);
 
     let port = match port.parse::<u16>() {
         Ok(port) => port,
