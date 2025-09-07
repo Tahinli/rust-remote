@@ -1,57 +1,58 @@
-use std::{env, fs::File, io::Read};
+use std::{env, net::IpAddr};
 
 use crate::{Config, Runner, RunnerMode};
 
-pub fn take_args() -> Option<RunnerMode> {
+pub fn take_args() -> Option<(RunnerMode, Config)> {
     let args: Vec<String> = env::args().collect();
-    if args.len() > 1 {
-        let runner = match &args[1][..] {
-            "--server" => Runner::Server,
-            "--client" => Runner::Client,
-            _ => return None,
-        };
-        let debug = if args.len() > 2 {
-            match &args[2][..] {
-                "--debug" => true,
-                _ => return None,
+    let mut runner = Runner::Server;
+    let mut debug = false;
+    let mut ip = "127.0.0.1".to_string();
+    let mut port = "3444".to_string();
+    for (i, arg) in args.iter().enumerate() {
+        match arg.as_str() {
+            "--server" | "-sv" => runner = Runner::Server,
+            "--client" | "-cl" => runner = Runner::Client,
+            "--debug" | "-d" => debug = true,
+            "--ip" | "i" => ip = args[i + 1].clone(),
+            "--port" | "p" => port = args[i + 1].clone(),
+            "--help" | "-h" => {
+                show_help();
+                std::process::exit(0);
             }
-        } else {
-            false
-        };
-        Some(RunnerMode::State(runner, debug))
-    } else {
-        None
+            _ => continue,
+        }
     }
+    let ip = match ip.parse::<IpAddr>() {
+        Ok(ip) => ip,
+        Err(err_val) => {
+            eprintln!("Error: IP Parse | {}", err_val);
+            return None;
+        }
+    };
+
+    let port = match port.parse::<u16>() {
+        Ok(port) => port,
+        Err(err_val) => {
+            eprintln!("Error: Port Parse | {}", err_val);
+            return None;
+        }
+    };
+
+    let config = Config { ip, port };
+
+    let runner_mode = RunnerMode::State(runner, debug);
+    Some((runner_mode, config))
 }
 
-pub fn read_config() -> Option<Config> {
-    let mut config_file = match File::open("configs/config.txt") {
-        Ok(config_file) => config_file,
-        Err(_) => return None,
-    };
-    let mut configs = String::new();
-    match config_file.read_to_string(&mut configs) {
-        Ok(_) => {
-            let configs: Vec<String> = configs.split('\n').map(|x| x.to_string()).collect();
-            let server_address = match configs[0].split(':').last() {
-                Some(server_address_unchecked) => match server_address_unchecked.parse() {
-                    Ok(server_address) => server_address,
-                    Err(_) => return None,
-                },
-                None => return None,
-            };
-            let port = match configs[1].split(':').last() {
-                Some(port_unchecked) => match port_unchecked.parse() {
-                    Ok(port) => port,
-                    Err(_) => return None,
-                },
-                None => return None,
-            };
-            Some(Config {
-                server_address,
-                port,
-            })
-        }
-        Err(_) => None,
-    }
+fn show_help() {
+    println!("\n\n\n");
+    println!("   Arguments          |  Details                    |  Defaults");
+    println!("----------------------------------------------------------------------");
+    println!("   -i  -> --ip        |  Specifies IP Address       |  127.0.0.1");
+    println!("   -p  -> --port      |  Specifies Port Address     |  3444");
+    println!("   -sv -> --server    |  Starts as a Server         |  True");
+    println!("   -cl -> --client    |  Starts as a Client         |  False");
+    println!("   -d  -> --debug     |  Starts in Debug Mode       |  False");
+    println!("   -h  -> --help      |  Shows Help                 |  False");
+    println!("\n\n\n");
 }

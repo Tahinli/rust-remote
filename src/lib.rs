@@ -6,18 +6,19 @@ pub mod client;
 pub mod server;
 pub mod utils;
 
+#[derive(Debug)]
 pub enum Runner {
     Server,
     Client,
 }
-
+#[derive(Debug)]
 pub enum RunnerMode {
     State(Runner, bool),
 }
 
 #[derive(Debug, Clone)]
 pub struct Config {
-    pub server_address: IpAddr,
+    pub ip: IpAddr,
     pub port: u16,
 }
 

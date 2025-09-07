@@ -28,26 +28,22 @@ pub async fn start(config: Config, debug: bool) {
     }
 }
 
-pub async fn connect(config: &Config, debug: bool) -> Option<(WebSocketSender, WebSocketReceiver)> {
-    let ws_connection =
-        match connect_async(format!("ws://{}:{}", config.server_address, config.port)).await {
-            Ok(ws_connection) => ws_connection,
-            Err(err_val) => {
-                if debug {
-                    eprintln!("Error: WebSocket Connection | {}", err_val);
-                }
-                return None;
+async fn connect(config: &Config, debug: bool) -> Option<(WebSocketSender, WebSocketReceiver)> {
+    let ws_connection = match connect_async(format!("ws://{}:{}", config.ip, config.port)).await {
+        Ok(ws_connection) => ws_connection,
+        Err(err_val) => {
+            if debug {
+                eprintln!("Error: WebSocket Connection | {}", err_val);
             }
-        };
+            return None;
+        }
+    };
 
     let (ws_sender, ws_receiver) = ws_connection.0.split();
     Some((ws_sender, ws_receiver))
 }
 
-pub async fn serve(
-    (ws_sender, mut ws_receiver): (WebSocketSender, WebSocketReceiver),
-    debug: bool,
-) {
+async fn serve((ws_sender, mut ws_receiver): (WebSocketSender, WebSocketReceiver), debug: bool) {
     let ws_sender = Arc::new(Mutex::new(ws_sender));
     while let Some(message) = receive(&mut ws_receiver, debug).await {
         match serde_json::from_str::<Payload>(&message[..]) {
@@ -68,7 +64,7 @@ pub async fn serve(
     }
 }
 
-pub async fn execute(payload: Payload, debug: bool) -> Option<Output> {
+async fn execute(payload: Payload, debug: bool) -> Option<Output> {
     if debug {
         println!("{:#?}", payload);
     }
@@ -87,7 +83,7 @@ pub async fn execute(payload: Payload, debug: bool) -> Option<Output> {
     }
 }
 
-pub async fn receive(ws_receiver: &mut WebSocketReceiver, debug: bool) -> Option<String> {
+async fn receive(ws_receiver: &mut WebSocketReceiver, debug: bool) -> Option<String> {
     match ws_receiver.next().await {
         Some(message) => match message {
             Ok(message) => {
@@ -116,7 +112,7 @@ pub async fn receive(ws_receiver: &mut WebSocketReceiver, debug: bool) -> Option
     }
 }
 
-pub async fn send(
+async fn send(
     output: Option<Output>,
     payload: Payload,
     ws_sender: Arc<Mutex<WebSocketSender>>,
