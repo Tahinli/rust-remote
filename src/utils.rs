@@ -1,15 +1,24 @@
 use std::{env, fs::File, io::Read};
 
-use crate::{Config, Runner};
+use crate::{Config, Runner, RunnerMode};
 
-pub fn take_args() -> Option<Runner> {
+pub fn take_args() -> Option<RunnerMode> {
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        match &args[1][..] {
-            "--server" => Some(Runner::Server),
-            "--client" => Some(Runner::Client),
-            _ => None,
-        }
+        let runner = match &args[1][..] {
+            "--server" => Runner::Server,
+            "--client" => Runner::Client,
+            _ => return None,
+        };
+        let debug = if args.len() > 2 {
+            match &args[2][..] {
+                "--debug" => true,
+                _ => return None,
+            }
+        } else {
+            false
+        };
+        Some(RunnerMode::State(runner, debug))
     } else {
         None
     }
